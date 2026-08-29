@@ -1,0 +1,289 @@
+{% extends 'user/base.html' %}
+{% block title %}Pengaturan Akun — Scholara Classroom{% endblock %}
+
+{% block extra_head %}
+<style>
+.settings-wrap { display: flex; gap: 24px; padding: 32px 0; max-width: 900px; margin: 0 auto; }
+.settings-sidebar {
+    width: 220px; flex-shrink: 0;
+    background: white; border-radius: 16px; border: 1px solid #E2E8F0;
+    padding: 20px; height: fit-content; position: sticky; top: 80px;
+}
+.settings-avatar-wrap { text-align: center; margin-bottom: 16px; }
+.settings-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    object-fit: cover; border: 3px solid #818CF8;
+    box-shadow: 0 4px 16px rgba(79,70,229,.2); margin: 0 auto 8px; display: block;
+}
+.settings-avatar-ph {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 28px; font-weight: 700;
+    border: 3px solid #818CF8; margin: 0 auto 8px;
+}
+.settings-name { font-weight: 700; font-size: 14px; color: #0F172A; }
+.settings-email { font-size: 12px; color: #94A3B8; word-break: break-all; }
+.settings-nav { margin-top: 16px; border-top: 1px solid #E2E8F0; padding-top: 12px; }
+.settings-nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px; color: #64748B; font-size: 13.5px;
+    cursor: pointer; transition: all .15s; font-weight: 500;
+}
+.settings-nav-item.active, .settings-nav-item:hover { background: #EEF2FF; color: #4F46E5; }
+
+.settings-main { flex: 1; }
+.settings-card {
+    background: white; border-radius: 16px; border: 1px solid #E2E8F0;
+    overflow: hidden; margin-bottom: 16px;
+}
+.settings-card-header { padding: 16px 20px; border-bottom: 1px solid #E2E8F0; font-weight: 700; font-size: 15px; }
+.settings-card-body { padding: 24px 20px; }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; width: 100%;
+}
+.theme-switch {
+    position: relative; width: 40px; height: 22px; flex-shrink: 0;
+}
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+.theme-slider {
+    position: absolute; inset: 0; cursor: pointer;
+    background: #CBD5E1; border-radius: 999px;
+    transition: .3s;
+}
+.theme-slider:before {
+    content: '';
+    position: absolute; width: 16px; height: 16px;
+    left: 3px; bottom: 3px;
+    background: white; border-radius: 50%;
+    transition: .3s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.theme-switch input:checked + .theme-slider { background: #4F46E5; }
+.theme-switch input:checked + .theme-slider:before { transform: translateX(18px); }
+
+.form-group { margin-bottom: 18px; }
+.form-label { font-size: 13px; font-weight: 600; color: #374151; display: block; margin-bottom: 6px; }
+.form-input {
+    width: 100%; padding: 11px 14px; border: 1px solid #E2E8F0;
+    border-radius: 10px; font-size: 14px; font-family: inherit;
+    outline: none; transition: border-color .2s; color: #0F172A;
+}
+.form-input:focus { border-color: #818CF8; box-shadow: 0 0 0 3px rgba(129,140,248,.15); }
+.form-input:disabled { background: #F8FAFC; color: #94A3B8; cursor: not-allowed; }
+textarea.form-input { resize: vertical; min-height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.upload-area {
+    border: 2px dashed #E2E8F0; border-radius: 12px;
+    padding: 24px; text-align: center; cursor: pointer;
+    transition: all .2s; position: relative;
+}
+.upload-area:hover { border-color: #818CF8; background: #F8FAFC; }
+.upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-icon { font-size: 32px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: #64748B; }
+.upload-text strong { color: #4F46E5; }
+
+.google-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #EEF2FF; border: 1px solid #C7D2FE;
+    padding: 8px 14px; border-radius: 10px; font-size: 13px; color: #4F46E5; font-weight: 500;
+    margin-bottom: 16px;
+}
+.btn-save {
+    padding: 11px 28px; border-radius: 10px; border: none;
+    background: #94A3B8; /* Abu-abu awal */
+    color: white; font-weight: 700; font-size: 14px; cursor: pointer;
+    transition: all .3s ease; box-shadow: 0 4px 12px rgba(148,163,184,.3);
+    display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+}
+.btn-save:hover { 
+    background: #16A34A; /* Hijau saat hover */
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 20px rgba(22,163,74,.4); 
+}
+.btn-save i { font-size: 18px; transition: transform .3s ease; }
+.btn-save:hover i { transform: scale(1.1); }
+
+@media(max-width:768px){ .settings-wrap{flex-direction:column;} .settings-sidebar{width:100%;} .form-row{grid-template-columns:1fr;} }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="settings-wrap">
+        <!-- Sidebar -->
+        <aside class="settings-sidebar">
+            <div class="settings-avatar-wrap">
+                {% if user and user.foto_profil %}
+                    {% if user.foto_profil.startswith('http') %}
+                    <img src="{{ user.foto_profil }}" class="settings-avatar" alt="{{ user.nama }}">
+                    {% else %}
+                    <img src="/static/uploads/pelanggan/{{ user.foto_profil }}" class="settings-avatar" alt="{{ user.nama }}">
+                    {% endif %}
+                {% elif session.get('foto') %}
+                <img src="{{ session.foto }}" class="settings-avatar" alt="{{ session.get('nama','') }}">
+                {% else %}
+                <div class="settings-avatar-ph">{{ (session.get('nama','U') or 'U')[0].upper() }}</div>
+                {% endif %}
+                <div class="settings-name">{{ user.nama if user else session.get('nama','-') }}</div>
+                <div class="settings-email">{{ user.email if user else session.get('email','-') }}</div>
+            </div>
+            <nav class="settings-nav">
+                <div class="settings-nav-item active"><i class="ph ph-user"></i> Profil Saya</div>
+                <a href="/user/pesanan" class="settings-nav-item" style="text-decoration:none"><i class="ph ph-package"></i> Pesanan</a>
+                <div class="settings-nav-item" id="themeNavItem" onclick="toggleTheme()" style="cursor:pointer">
+                    <div class="theme-toggle-row">
+                        <span style="display:flex;align-items:center;gap:8px">
+                            <i class="ph ph-sun" id="themeIcon"></i>
+                            <span id="themeLabel">Tema Terang</span>
+                        </span>
+                        <label class="theme-switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="themeCheckbox" onchange="toggleTheme()">
+                            <span class="theme-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <a href="/logout" class="settings-nav-item danger" style="text-decoration:none;color:#EF4444"><i class="ph ph-sign-out"></i> Keluar</a>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <div class="settings-main">
+            <div class="settings-card">
+                <div class="settings-card-header"><i class="ph ph-user"></i> Informasi Profil</div>
+                <div class="settings-card-body">
+                    {% if user and user.google_id %}
+                    <div class="google-badge">
+                        <span>🔗</span> Terhubung dengan Google
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Nama Lengkap</label>
+                                <input type="text" name="nama" class="form-input"
+                                       value="{{ user.nama if user else session.get('nama','') }}"
+                                       placeholder="Nama lengkap">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telepon</label>
+                                <input type="tel" name="telepon" class="form-input"
+                                       value="{{ user.telepon if user else '' }}"
+                                       placeholder="08xxxxxxxxxx">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" disabled
+                                   value="{{ user.email if user else session.get('email','') }}">
+                            <small style="color:#94A3B8;font-size:11px">Email tidak dapat diubah</small>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Kota</label>
+                                <input type="text" name="kota" class="form-input"
+                                       value="{{ user.kota if user else '' }}"
+                                       placeholder="Kota domisili">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Alamat Lengkap</label>
+                            <textarea name="alamat" class="form-input" placeholder="Jl. Contoh No. 123...">{{ user.alamat if user else '' }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Foto Profil</label>
+                            <div class="upload-area">
+                                <input type="file" name="foto_profil" accept="image/*"
+                                       onchange="previewPhoto(this)">
+                                <div id="upload-preview">
+                                    <div class="upload-icon">📷</div>
+                                    <div class="upload-text"><strong>Klik untuk upload</strong> atau drag & drop</div>
+                                    <div class="upload-text" style="margin-top:4px">PNG, JPG, JPEG (maks. 2MB)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-save"><i class="ph ph-floppy-disk"></i> Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="settings-card">
+                <div class="settings-card-header"><i class="ph ph-chart-bar"></i> Statistik Akun</div>
+                <div class="settings-card-body">
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                        <div style="background:#EEF2FF;border-radius:12px;padding:16px;text-align:center;">
+                            <div style="font-size:24px;font-weight:800;color:#4F46E5">{{ user.kode_pelanggan if user else '-' }}</div>
+                            <div style="font-size:12px;color:#6366F1;margin-top:4px">Kode Pelanggan</div>
+                        </div>
+                        <div style="background:#F0FDF4;border-radius:12px;padding:16px;text-align:center;">
+                            <a href="/user/pesanan" style="text-decoration:none">
+                                <div style="font-size:24px;font-weight:800;color:#059669"><i class="ph ph-package"></i></div>
+                                <div style="font-size:12px;color:#059669;margin-top:4px">Lihat Pesanan</div>
+                            </a>
+                        </div>
+                        <div style="background:#FFF7ED;border-radius:12px;padding:16px;text-align:center;">
+                            <div style="font-size:24px;font-weight:800;color:#D97706">{{ user.status | capitalize if user else 'Aktif' }}</div>
+                            <div style="font-size:12px;color:#D97706;margin-top:4px">Status Akun</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewPhoto(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('upload-preview').innerHTML =
+                `<img src="${e.target.result}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #818CF8">
+                 <div style="margin-top:8px;font-size:12px;color:#4F46E5;font-weight:600">${input.files[0].name}</div>`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function applyThemeUI(isDark) {
+    const icon  = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+    const cb    = document.getElementById('themeCheckbox');
+    if (isDark) {
+        icon.className  = 'ph ph-moon';
+        label.textContent = 'Tema Gelap';
+        cb.checked = true;
+    } else {
+        icon.className  = 'ph ph-sun';
+        label.textContent = 'Tema Terang';
+        cb.checked = false;
+    }
+}
+
+function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next   = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('scholara-theme', next);
+    applyThemeUI(next === 'dark');
+}
+
+// Init
+(function() {
+    const saved = localStorage.getItem('scholara-theme') || 'light';
+    applyThemeUI(saved === 'dark');
+})();
+</script>
+{% endblock %}

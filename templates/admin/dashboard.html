@@ -1,0 +1,201 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Dashboard</h1>
+        <div class="breadcrumb">Ringkasan aktivitas hari ini</div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#EEF2FF;color:#4F46E5"><i class="ph ph-users"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Total Pelanggan</div>
+            <div class="stat-value">{{ "{:,}".format(total_pelanggan) }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#F0FDF4;color:#10B981"><i class="ph ph-package"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Produk Aktif</div>
+            <div class="stat-value">{{ "{:,}".format(total_produk) }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#FFFBEB;color:#F59E0B"><i class="ph ph-shopping-cart"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Pesanan Bulan Ini</div>
+            <div class="stat-value">{{ "{:,}".format(total_pesanan) }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#FEF2F2;color:#EF4444"><i class="ph ph-coins"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Omzet Bulan Ini</div>
+            <div class="stat-value">{{ total_penjualan | rupiah }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Chart Penjualan -->
+    <div class="card">
+        <div class="card-header">Trend Penjualan (6 Bulan Terakhir)</div>
+        <div class="card-body">
+            <canvas id="chartPenjualan" height="240"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart Status -->
+    <div class="card">
+        <div class="card-header">Status Pesanan Bulan Ini</div>
+        <div class="card-body" style="display:flex;justify-content:center">
+            <canvas id="chartStatus" height="240" style="max-width:300px"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2 mt-2">
+    <!-- Pesanan Terbaru -->
+    <div class="card">
+        <div class="card-header">
+            <span>Pesanan Terbaru</span>
+            <a href="/pesanan" class="btn btn-outline btn-sm">Lihat Semua</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No. Pesanan</th>
+                        <th>Pelanggan</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in pesanan_terbaru %}
+                    <tr>
+                        <td class="td-mono fw-bold">{{ p.no_pesanan }}</td>
+                        <td>{{ p.nama_pelanggan }}</td>
+                        <td>
+                            {% if p.status == 'pending' %}<span class="badge badge-yellow">Pending</span>
+                            {% elif p.status == 'diproses' %}<span class="badge badge-blue">Diproses</span>
+                            {% elif p.status == 'dikirim' %}<span class="badge badge-purple">Dikirim</span>
+                            {% elif p.status == 'selesai' %}<span class="badge badge-green">Selesai</span>
+                            {% else %}<span class="badge badge-red">Batal</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="text-center text-muted" style="padding:20px">Belum ada pesanan terbaru.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Stok Menipis -->
+    <div class="card">
+        <div class="card-header">
+            <span>Peringatan Stok Menipis</span>
+            <a href="/produk" class="btn btn-outline btn-sm">Lihat Produk</a>
+        </div>
+        <div class="table-wrap">
+            {% if stok_menipis %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Produk</th>
+                        <th>Sisa Stok</th>
+                        <th>Batas Min.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in stok_menipis %}
+                    <tr>
+                        <td>{{ s.nama }}</td>
+                        <td><span class="badge badge-red">{{ s.stok }} {{ s.satuan }}</span></td>
+                        <td class="td-mono">{{ s.stok_minimum }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="ph ph-check-circle"></i></div>
+                <div class="empty-text">Semua stok produk dalam kondisi aman.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Parse data JSON dari backend
+const rawGrafik = {{ grafik_json | safe }};
+const rawStatus = {{ status_json | safe }};
+
+// --- CHART 1: TREND PENJUALAN ---
+const labels1 = rawGrafik.map(d => d.bulan);
+const data1 = rawGrafik.map(d => parseFloat(d.total));
+
+new Chart(document.getElementById('chartPenjualan'), {
+    type: 'line',
+    data: {
+        labels: labels1,
+        datasets: [{
+            label: 'Total Penjualan (Rp)',
+            data: data1,
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { callback: function(value) { return 'Rp ' + (value/1000) + 'k'; } }
+            }
+        }
+    }
+});
+
+// --- CHART 2: STATUS PESANAN ---
+const statusColors = {
+    'pending': '#F59E0B',
+    'diproses': '#3B82F6',
+    'dikirim': '#8B5CF6',
+    'selesai': '#10B981',
+    'dibatalkan': '#EF4444'
+};
+const labels2 = rawStatus.map(d => d.status.charAt(0).toUpperCase() + d.status.slice(1));
+const data2 = rawStatus.map(d => parseInt(d.jumlah));
+const bgColors = rawStatus.map(d => statusColors[d.status] || '#94A3B8');
+
+new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: {
+        labels: labels2,
+        datasets: [{
+            data: data2,
+            backgroundColor: bgColors,
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '70%',
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+</script>
+{% endblock %}

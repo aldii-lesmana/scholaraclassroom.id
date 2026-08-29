@@ -1,0 +1,490 @@
+{% extends 'user/base.html' %}
+{% block title %}Beranda — Scholara Classroom{% endblock %}
+{% block meta_desc %}Toko buku & perlengkapan pendidikan terlengkap untuk semua jenjang pendidikan{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── BASE + CONTAINER ── */
+body {
+    background-color: #F4F7F6;
+}
+
+/* ── BENTO GRID HERO ── */
+.bento-hero {
+    padding: 32px 24px 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 16px;
+    min-height: 420px;
+}
+
+.bento-item {
+    border-radius: 24px;
+    padding: 32px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bento-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(22, 163, 74, 0.15);
+}
+
+/* Bento 1: Main Banner (Left, spans both rows) */
+.bento-main {
+    grid-row: span 2;
+    background: linear-gradient(135deg, #0F3D25 0%, #16A34A 100%);
+    color: white;
+}
+.bento-main-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    width: 65%; /* Leaves room for the image on the right */
+}
+.bento-main-img {
+    position: absolute;
+    bottom: 0;
+    right: 20px;
+    height: 105%; /* Makes the image slightly taller than the container for a pop-out effect */
+    max-height: 460px;
+    object-fit: contain;
+    z-index: 1;
+    pointer-events: none;
+}
+.bento-main::before {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    top: -100px; right: -100px;
+    pointer-events: none;
+}
+.bento-main-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    width: fit-content; margin-bottom: 24px;
+    backdrop-filter: blur(8px);
+}
+.bento-main h1 {
+    font-size: 42px; font-weight: 800; line-height: 1.15;
+    margin-bottom: 16px; letter-spacing: -1px;
+}
+.bento-main h1 span { color: #86EFAC; }
+.bento-main p {
+    font-size: 16px; color: rgba(255,255,255,0.85);
+    line-height: 1.6; max-width: 480px; margin-bottom: 32px;
+}
+.bento-main-btns {
+    display: flex; gap: 12px; margin-top: auto;
+}
+.btn-bento-primary {
+    background: white; color: #16A34A;
+    padding: 14px 24px; border-radius: 12px;
+    font-weight: 700; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.btn-bento-primary:hover { background: #F0FDF4; transform: translateY(-2px); }
+.btn-bento-outline {
+    background: rgba(255,255,255,0.1); color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 14px 24px; border-radius: 12px;
+    font-weight: 700; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    backdrop-filter: blur(8px); transition: all 0.2s;
+}
+.btn-bento-outline:hover { background: rgba(255,255,255,0.2); }
+
+/* Bento 2: Promo Banner (Top Right) */
+.bento-promo {
+    background: #DCFCE7;
+    color: #166534;
+    border: 1px solid #BBF7D0;
+}
+.bento-promo h3 {
+    font-size: 24px; font-weight: 800; margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+.bento-promo p { font-size: 14px; color: #15803D; line-height: 1.5; }
+.bento-promo-icon {
+    position: absolute; right: 24px; bottom: -10px;
+    font-size: 80px; opacity: 0.15;
+}
+
+/* Bento 3 + 4: Features (Bottom Right split) */
+.bento-features {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.bento-feat {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid #E2E8F0;
+    display: flex; flex-direction: column; justify-content: center;
+    transition: all 0.2s;
+}
+.bento-feat:hover {
+    border-color: #86EFAC;
+    box-shadow: 0 8px 24px rgba(22,163,74,0.08);
+}
+.bf-icon {
+    width: 48px; height: 48px;
+    background: #F0FDF4; color: #16A34A;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 16px;
+}
+.bf-title { font-weight: 700; font-size: 15px; color: #0F172A; margin-bottom: 4px; }
+.bf-desc { font-size: 12px; color: #64748B; line-height: 1.4; }
+
+
+/* ── SECTION + KATEGORI ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 48px 0; }
+.section-head { margin-bottom: 28px; display: flex; align-items: flex-end; justify-content: space-between; }
+.section-title { font-size: 24px; font-weight: 800; color: #0F172A; }
+.section-sub { color: #64748B; font-size: 14px; margin-top: 4px; }
+/* ── JENJANG BANNERS ── */
+.jenjang-section { padding: 48px 0 32px; }
+.jenjang-scroll {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.jenjang-scroll::-webkit-scrollbar { display: none; }
+.jenjang-card {
+    flex: 0 0 220px;
+    height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    scroll-snap-align: start;
+    text-decoration: none;
+    display: block;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.jenjang-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+}
+.jenjang-photo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s ease;
+}
+.jenjang-card:hover .jenjang-photo { transform: scale(1.08); }
+.jenjang-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.3) 55%, rgba(0,0,0,.05) 100%);
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px 18px;
+}
+.jenjang-badge {
+    position: absolute; top: 16px; left: 16px;
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.3);
+    backdrop-filter: blur(8px);
+    color: white; font-size: 10.5px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px;
+    width: fit-content;
+    text-transform: uppercase; letter-spacing: .5px;
+}
+.jenjang-name {
+    color: white; font-size: 22px; font-weight: 800;
+    line-height: 1.2; margin-bottom: 4px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.jenjang-tagline {
+    color: rgba(255,255,255,.8); font-size: 12px;
+    line-height: 1.4; margin-bottom: 14px;
+}
+.jenjang-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: white; color: #0F172A;
+    padding: 8px 14px; border-radius: 10px;
+    font-size: 12px; font-weight: 700;
+    width: fit-content;
+    transition: background .2s;
+}
+.jenjang-card:hover .jenjang-btn { background: #F0FDF4; color: #16A34A; }
+/* Fallback placeholder saat foto belum ada */
+.jenjang-photo-ph {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px;
+}
+.jenjang-card.sd   .jenjang-photo-ph { background: linear-gradient(135deg,#22C55E,#16A34A); }
+.jenjang-card.smp  .jenjang-photo-ph { background: linear-gradient(135deg,#3B82F6,#1D4ED8); }
+.jenjang-card.sma  .jenjang-photo-ph { background: linear-gradient(135deg,#8B5CF6,#6D28D9); }
+.jenjang-card.smk  .jenjang-photo-ph { background: linear-gradient(135deg,#F59E0B,#D97706); }
+.jenjang-card.pt   .jenjang-photo-ph { background: linear-gradient(135deg,#EC4899,#BE185D); }
+@media(max-width:768px){
+    .jenjang-card { flex: 0 0 180px; height: 260px; }
+    .jenjang-name { font-size: 18px; }
+}
+
+.cat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.cat-card {
+    background: white; border-radius: 20px; padding: 24px 16px;
+    text-align: center; border: 1px solid #E2E8F0;
+    text-decoration: none; color: #0F172A;
+    transition: all .2s ease; box-shadow: 0 2px 10px rgba(0,0,0,.02);
+}
+.cat-card:hover {
+    transform: translateY(-4px); box-shadow: 0 12px 24px rgba(22,163,74,.08);
+    border-color: #86EFAC;
+}
+.cat-icon { 
+    font-size: 32px; display: inline-block; margin-bottom: 12px;
+    width: 64px; height: 64px; line-height: 64px;
+    background: #F0FDF4; border-radius: 16px;
+}
+.cat-name { font-size: 13.5px; font-weight: 600; }
+
+/* ── PRODUCT GRID ── */
+.products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.product-card {
+    background: white; border-radius: 20px; overflow: hidden;
+    border: 1px solid #E2E8F0; transition: all .2s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,.02);
+}
+.product-card:hover {
+    transform: translateY(-4px); box-shadow: 0 16px 32px rgba(22,163,74,.1);
+    border-color: #86EFAC;
+}
+.product-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    background: #F8FAFC;
+}
+.product-img-ph {
+    width: 100%; aspect-ratio: 1;
+    background: #F0FDF4;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px; color: #86EFAC;
+}
+.product-info { padding: 16px; }
+.product-cat { font-size: 11px; font-weight: 700; color: #16A34A; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.product-name { 
+    font-weight: 600; font-size: 14.5px; line-height: 1.4; color: #0F172A; 
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; 
+    margin-bottom: 12px; min-height: 40px;
+}
+.product-price { font-size: 18px; font-weight: 800; color: #16A34A; }
+.product-footer { padding: 16px; border-top: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 8px; }
+.btn-cart { width: 100%; padding: 7px; border-radius: 7px; border: none; background: #16A34A; color: white; font-weight: 600; font-size: 12px; cursor: pointer; transition: all .2s; }
+.btn-cart:hover { background: #15803D; }
+.btn-buy { width: 100%; padding: 7px; border-radius: 7px; border: none; background: #16A34A; color: white; font-weight: 600; font-size: 12px; cursor: pointer; transition: all .2s; text-align: center; text-decoration: none; display: block; }
+.btn-buy:hover { background: #15803D; color: white; }
+.btn-detail { padding: 7px 12px; border-radius: 7px; border: 1px solid #E2E8F0; background: white; color: #475569; font-weight: 600; font-size: 12px; cursor: pointer; transition: all .2s; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+.btn-detail:hover { background: #F8FAFC; color: #0F172A; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){ 
+    .bento-hero { grid-template-columns: 1fr; grid-template-rows: auto; min-height: auto; }
+    .bento-main { grid-row: auto; }
+    .products-grid{grid-template-columns:repeat(3,1fr);} 
+    .cat-grid{grid-template-columns:repeat(3,1fr);} 
+}
+@media(max-width:768px){ 
+    .bento-features { grid-template-columns: 1fr; }
+    .products-grid,.cat-grid{grid-template-columns:repeat(2,1fr);} 
+    .bento-main h1 { font-size: 32px; }
+}
+@media(max-width:480px){ 
+    .products-grid{grid-template-columns:1fr;} 
+    .cat-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- BENTO HERO -->
+<section class="bento-hero">
+    <!-- Bento Main -->
+    <div class="bento-item bento-main">
+        <div class="bento-main-content">
+            <div class="bento-main-badge"><i class="ph ph-sparkle"></i> Platform Pendidikan No. 1</div>
+            <h1>Toko Buku &amp; Perlengkapan<br><span>Pendidikan</span> Terlengkap</h1>
+            <p>Temukan ribuan buku pelajaran untuk SD, SMP, SMA, SMK hingga Perguruan Tinggi dengan harga super terjangkau.</p>
+            <div class="bento-main-btns">
+                <a href="/user/katalog" class="btn-bento-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    Lihat Produk
+                </a>
+                <a href="/user/katalog?sort=terjangkau" class="btn-bento-outline">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Harga Terjangkau
+                </a>
+            </div>
+        </div>
+        <img src="/static/img/hero_admin_1.png" alt="Admin" class="bento-main-img">
+    </div>
+
+    <!-- Bento Promo -->
+    <div class="bento-item bento-promo">
+        <h3>Bebas Ongkir se-Indonesia!</h3>
+        <p>Nikmati promo bebas ongkos kirim tanpa minimal belanja khusus hari ini.</p>
+        <div class="bento-promo-icon"></div>
+    </div>
+
+    <!-- Bento Features Split -->
+    <div class="bento-features">
+        <div class="bento-feat">
+            <div class="bf-icon">𝟏𝟎𝟎%</div>
+            <div class="bf-title">Kualitas Asli</div>
+            <div class="bf-desc">Produk 100% original &amp; bermutu.</div>
+        </div>
+        <div class="bento-feat">
+            <div class="bf-icon"><i class="ph ph-shield"></i></div>
+            <div class="bf-title">Transaksi Aman</div>
+            <div class="bf-desc">Pembayaran terenkripsi &amp; aman.</div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <!-- BANNER JENJANG -->
+    <section class="jenjang-section">
+        <div class="section-head">
+            <div>
+                <div class="section-title">Kategori Populer</div>
+                <div class="section-sub">Temukan buku & perlengkapan sesuai jenjang pendidikanmu</div>
+            </div>
+            <a href="/user/produk" class="see-all">Lihat Semua →</a>
+        </div>
+        <div class="jenjang-scroll">
+
+            {% set jenjang_data = [
+                {'nama': 'SD',               'cls': 'sd',  'tagline': 'Buku & alat belajar untuk siswa Sekolah Dasar',              'icon': '<i class="ph ph-pencil"></i>'},
+                {'nama': 'SMP',              'cls': 'smp', 'tagline': 'Lengkapi kebutuhan belajar SMP kamu di sini',                 'icon': '<i class="ph ph-book-open"></i>'},
+                {'nama': 'SMA',              'cls': 'sma', 'tagline': 'Buku pelajaran & referensi terlengkap untuk SMA',             'icon': '<i class="ph ph-graduation-cap"></i>'},
+                {'nama': 'SMK',              'cls': 'smk', 'tagline': 'Modul & perlengkapan praktik untuk siswa SMK',                'icon': '<i class="ph ph-wrench"></i>'},
+                {'nama': 'Perguruan Tinggi', 'cls': 'pt',  'tagline': 'Buku referensi & jurnal akademik untuk mahasiswa',           'icon': '<i class="ph ph-books"></i>'}
+            ] %}
+
+            {% for j in jenjang_data %}
+                {% set kat_match = kategori | selectattr('nama', 'equalto', j.nama) | list %}
+                {% set kat_id = kat_match[0].id if kat_match else '' %}
+                {% set img_map = {'sd': 'jenjang_sd.png', 'smp': 'jenjang_smp.jpg', 'sma': 'jenjang_SMA.png', 'smk': 'jenjang_smk.png', 'pt': 'jenjang_pt.png'} %}
+                {% set img_file = img_map[j.cls] %}
+                <a href="/user/produk{% if kat_id %}?kat={{ kat_id }}{% endif %}" class="jenjang-card {{ j.cls }}">
+                    {% set img_path = '/static/img/' + img_file %}
+                    <img src="{{ img_path }}" alt="Jenjang {{ j.nama }}" class="jenjang-photo"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="jenjang-photo-ph" style="display:none">{{ j.icon | safe }}</div>
+                    <div class="jenjang-overlay">
+                        <div class="jenjang-badge">{{ j.icon | safe }} Jenjang</div>
+                        <div class="jenjang-name">{{ j.nama }}</div>
+                        <div class="jenjang-tagline">{{ j.tagline }}</div>
+                        <div class="jenjang-btn">
+                            <i class="ph ph-arrow-right"></i> Lihat Produk
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+
+        </div>
+    </section>
+
+    <!-- PRODUK UNGGULAN -->
+    <section class="section">
+        <div class="section-head">
+            <div>
+                <div class="section-title">🔥 Sedang Tren</div>
+                <div class="section-sub">Produk pendidikan paling banyak dicari saat ini</div>
+            </div>
+            <a href="/user/katalog" class="see-all">Lihat Semua →</a>
+        </div>
+        {% if produk_unggulan %}
+        <div class="products-grid">
+            {% for p in produk_unggulan %}
+            <div class="product-card">
+                <a href="/user/produk/{{ p.id }}">
+                    {% if p.gambar %}
+                    <img src="/static/uploads/produk/{{ p.gambar }}" class="product-img" alt="{{ p.nama }}" loading="lazy">
+                    {% else %}
+                    <div class="product-img-ph"><i class="ph ph-book-open"></i></div>
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <div class="product-cat">{{ p.kategori_nama or 'Umum' }}</div>
+                    <div class="product-name">{{ p.nama }}</div>
+                    <div class="product-price">{{ format_rupiah(p.harga) }}</div>
+                </div>
+                <div class="product-footer">
+                    <a href="#" class="btn-buy" onclick="addToCart({{ p.id }}, this); setTimeout(()=>window.location.href='/user/keranjang',300); return false;">Beli Sekarang</a>
+                    <button class="btn-cart" onclick="addToCart({{ p.id }}, this)"><i class="ph ph-shopping-cart"></i> Keranjang</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:48px;color:#94A3B8">
+            <div style="font-size:48px;margin-bottom:12px">📭</div>
+            <div>Belum ada produk tersedia</div>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- PRODUK BARU -->
+    {% if produk_baru %}
+    <section class="section">
+        <div class="section-head">
+            <div>
+                <div class="section-title"><i class="ph ph-sparkle"></i> Rilisan Baru</div>
+                <div class="section-sub">Koleksi buku dan alat tulis terbaru di produk kami</div>
+            </div>
+            <a href="/user/katalog?sort=terbaru" class="see-all">Lihat Semua →</a>
+        </div>
+        <div class="products-grid">
+            {% for p in produk_baru %}
+            <div class="product-card">
+                <a href="/user/produk/{{ p.id }}">
+                    {% if p.gambar %}
+                    <img src="/static/uploads/produk/{{ p.gambar }}" class="product-img" alt="{{ p.nama }}" loading="lazy">
+                    {% else %}
+                    <div class="product-img-ph"><i class="ph ph-book"></i></div>
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <div class="product-cat">{{ p.kategori_nama or 'Umum' }}</div>
+                    <div class="product-name">{{ p.nama }}</div>
+                    <div class="product-price">{{ format_rupiah(p.harga) }}</div>
+                </div>
+                <div class="product-footer">
+                    <a href="#" class="btn-buy" onclick="addToCart({{ p.id }}, this); setTimeout(()=>window.location.href='/user/keranjang',300); return false;">⚡ Beli Sekarang</a>
+                    <button class="btn-cart" onclick="addToCart({{ p.id }}, this)"><i class="ph ph-shopping-cart"></i> Keranjang</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

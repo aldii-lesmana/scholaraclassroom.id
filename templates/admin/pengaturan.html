@@ -1,0 +1,86 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Pengaturan Sistem</h1>
+        <div class="breadcrumb"><a href="/dashboard">Dashboard</a> / Pengaturan</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Profil Admin -->
+    <div class="form-card">
+        <div class="form-card-header"><i class="ph ph-user"></i> Profil Administrator</div>
+        <div class="form-card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="update_profile">
+                
+                <div style="text-align:center;margin-bottom:20px">
+                    {% if session.get('admin_foto') %}
+                    <img src="{{ session.admin_foto }}" alt="Admin" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--border);margin-bottom:12px">
+                    {% else %}
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#7C3AED);display:flex;align-items:center;justify-content:center;font-size:32px;color:white;font-weight:700;margin:0 auto 12px">A</div>
+                    {% endif %}
+                    
+                    <div>
+                        <label for="foto" class="btn btn-outline btn-sm" style="cursor:pointer">Ubah Foto</label>
+                        <input type="file" id="foto" name="foto" accept="image/*" style="display:none">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Admin</label>
+                    <input type="text" name="name" value="{{ session.get('admin_name', 'Admin') }}" required>
+                </div>
+                
+                <div class="form-group mt-1">
+                    <label>Username Login</label>
+                    <input type="text" value="{{ session.get('admin_username', 'admin') }}" disabled style="background:#F8FAFC">
+                    <small class="text-muted">Username tidak dapat diubah</small>
+                </div>
+
+                <div class="form-actions mt-2">
+                    <button type="submit" class="btn btn-primary">Simpan Profil</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ganti Password -->
+    <div class="form-card">
+        <div class="form-card-header"><i class="ph ph-lock"></i> Ganti Password</div>
+        <div class="form-card-body">
+            <form method="POST">
+                <input type="hidden" name="action" value="change_password">
+                
+                <div class="form-group">
+                    <label>Password Saat Ini</label>
+                    <input type="password" name="old_password" required>
+                </div>
+                
+                <div class="form-group mt-1">
+                    <label>Password Baru</label>
+                    <input type="password" name="new_password" required minlength="6">
+                </div>
+                
+                <div class="form-group mt-1">
+                    <label>Konfirmasi Password Baru</label>
+                    <input type="password" name="confirm_password" required minlength="6">
+                </div>
+
+                <div class="form-actions mt-2">
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="form-card" style="margin-top:20px;max-width:50%">
+    <div class="form-card-header" style="color:var(--danger)"><i class="ph ph-warning"></i> Zona Bahaya</div>
+    <div class="form-card-body">
+        <p class="text-muted mb-2">Aksi di bawah ini tidak dapat dibatalkan dan akan mempengaruhi sistem secara permanen.</p>
+        <a href="/logout" class="btn btn-outline" style="color:var(--danger);border-color:var(--danger)">Keluar dari Sesi Ini</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Daftar Pesanan</h1>
+        <div class="breadcrumb"><a href="/dashboard">Dashboard</a> / Pesanan</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <form method="GET" class="search-form">
+            <div class="search-input-wrap">
+                <span class="search-icon"><i class="ph ph-magnifying-glass"></i></span>
+                <input type="text" name="search" class="search-input" placeholder="Cari No. Pesanan / Nama..." value="{{ search }}">
+            </div>
+            <select name="status" style="width:160px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;outline:none" onchange="this.form.submit()">
+                <option value="">Semua Status</option>
+                <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="diproses" {% if request.args.get('status') == 'diproses' %}selected{% endif %}>Diproses</option>
+                <option value="dikirim" {% if request.args.get('status') == 'dikirim' %}selected{% endif %}>Dikirim</option>
+                <option value="selesai" {% if request.args.get('status') == 'selesai' %}selected{% endif %}>Selesai</option>
+                <option value="dibatalkan" {% if request.args.get('status') == 'dibatalkan' %}selected{% endif %}>Dibatalkan</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            {% if search or request.args.get('status') %}
+            <a href="/pesanan" class="btn btn-outline">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="table-wrap">
+        {% if data %}
+        <table>
+            <thead>
+                <tr>
+                    <th>No. Pesanan / Tanggal</th>
+                    <th>Pembeli / Pelanggan</th>
+                    <th>Status</th>
+                    <th>Metode Bayar</th>
+                    <th>Total</th>
+                    <th style="width:120px;text-align:center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>
+                        <div class="td-mono fw-bold">{{ row.no_pesanan }}</div>
+                        <div class="text-muted" style="font-size:11px;margin-top:2px">
+                            {{ row.tanggal_pesan.strftime('%d %b %Y %H:%M') if row.tanggal_pesan else '-' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ row.nama_pembeli or '-' }}</div>
+                        {% if row.pelanggan_kode %}
+                        <div class="text-muted" style="font-size:11px;margin-top:2px">ID: {{ row.pelanggan_kode }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if row.status == 'pending' %}<span class="badge badge-yellow">Pending</span>
+                        {% elif row.status == 'diproses' %}<span class="badge badge-blue">Diproses</span>
+                        {% elif row.status == 'dikirim' %}<span class="badge badge-purple">Dikirim</span>
+                        {% elif row.status == 'selesai' %}<span class="badge badge-green">Selesai</span>
+                        {% else %}<span class="badge badge-red">Dibatalkan</span>{% endif %}
+                    </td>
+                    <td><span class="badge badge-gray">{{ row.metode_bayar | upper if row.metode_bayar else 'COD' }}</span></td>
+                    <td class="fw-bold text-primary">{{ row.total_bayar | rupiah }}</td>
+                    <td style="text-align:center">
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="/pesanan/edit/{{ row.no_pesanan }}" class="btn btn-outline btn-sm" title="Edit Status"><i class="ph ph-pencil"></i></a>
+                            <a href="/pesanan/hapus/{{ row.no_pesanan }}" class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="return confirm('Hapus pesanan ini?')" title="Hapus"><i class="ph ph-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="ph ph-shopping-cart"></i></div>
+            <div class="empty-text">
+                {% if search or request.args.get('status') %}Tidak ada pesanan yang cocok dengan filter.
+                {% else %}Belum ada data pesanan masuk.{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

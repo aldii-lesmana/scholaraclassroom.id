@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: scholara-user
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn user_marketplace:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_DB
+        value: sistem_penjualan
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: RENDER_EXTERNAL_URL
+        sync: false

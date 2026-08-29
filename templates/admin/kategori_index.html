@@ -1,0 +1,60 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Kategori Produk</h1>
+        <div class="breadcrumb"><a href="/dashboard">Dashboard</a> / Kategori</div>
+    </div>
+    <div>
+        <a href="/kategori/tambah" class="btn btn-primary">＋ Tambah Kategori</a>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card" style="grid-column: 1 / -1; max-width: 800px;">
+        <div class="card-header">
+            Daftar Kategori
+        </div>
+        <div class="table-wrap">
+            {% if data %}
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:60px">ID</th>
+                        <th>Nama Kategori</th>
+                        <th>Jumlah Produk</th>
+                        <th style="width:120px;text-align:center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td class="td-mono text-muted">#{{ row.id }}</td>
+                        <td class="fw-bold">{{ row.nama }}</td>
+                        <td>
+                            <span class="badge badge-blue">{{ row.jumlah_produk or 0 }} Produk</span>
+                        </td>
+                        <td style="text-align:center">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="/kategori/edit/{{ row.id }}" class="btn btn-outline btn-sm" title="Edit"><i class="ph ph-pencil"></i></a>
+                                {% if row.jumlah_produk == 0 %}
+                                <a href="/kategori/hapus/{{ row.id }}" class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="return confirm('Hapus kategori ini?')" title="Hapus"><i class="ph ph-trash"></i></a>
+                                {% else %}
+                                <button class="btn btn-outline btn-sm" style="color:#94A3B8;cursor:not-allowed" title="Kategori masih memiliki produk" disabled><i class="ph ph-trash"></i></button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="ph ph-tag"></i></div>
+                <div class="empty-text">Belum ada kategori ditambahkan.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

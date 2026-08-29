@@ -1,0 +1,72 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Pengguna Website</h1>
+        <div class="breadcrumb"><a href="/dashboard">Dashboard</a> / Pengguna Web</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Daftar Akun Pengguna Terdaftar (Login via Google)
+    </div>
+    <div class="table-wrap">
+        {% if data %}
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:60px">Avatar</th>
+                    <th>Nama</th>
+                    <th>Email / Google ID</th>
+                    <th>Kontak / Domisili</th>
+                    <th>Didaftarkan Pada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>
+                        {% if row.foto_profil %}
+                        {% if row.foto_profil.startswith('http') %}
+                        <img src="{{ row.foto_profil }}" alt="Img" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--border)">
+                        {% else %}
+                        <img src="/static/uploads/pelanggan/{{ row.foto_profil }}" alt="Img" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--border)">
+                        {% endif %}
+                        {% else %}
+                        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#7C3AED);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:700">{{ row.nama[0] | upper }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ row.nama }}</div>
+                        <div class="text-muted" style="font-size:11px;margin-top:2px">ID Pelanggan: {{ row.kode_pelanggan }}</div>
+                    </td>
+                    <td>
+                        <div>{{ row.email }}</div>
+                        {% if row.google_id %}
+                        <div style="font-size:11px;margin-top:2px;color:var(--primary);display:flex;align-items:center;gap:4px">
+                            <span>🔗</span> Google Linked
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="font-size:12.5px">{{ row.telepon or '-' }}</div>
+                        <div class="text-muted" style="font-size:11.5px;margin-top:2px">{{ row.kota or '-' }}</div>
+                    </td>
+                    <td>
+                        <div style="font-size:12.5px">{{ row.created_at.strftime('%d %b %Y') if row.created_at else '-' }}</div>
+                        <div class="text-muted" style="font-size:11px">{{ row.created_at.strftime('%H:%M') if row.created_at else '' }}</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="ph ph-users"></i></div>
+            <div class="empty-text">Belum ada pengguna yang mendaftar melalui website.</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

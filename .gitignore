@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+static/uploads/pelanggan/
+
+.vercel
+.env*
+fix_base.py

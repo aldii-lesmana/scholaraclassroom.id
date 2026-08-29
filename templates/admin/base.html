@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} — Scholara Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --sidebar-bg: #0F172A;
+            --sidebar-hover: #1E293B;
+            --sidebar-active: #1D4ED8;
+            --sidebar-text: #94A3B8;
+            --sidebar-text-active: #FFFFFF;
+            --topbar-bg: #FFFFFF;
+            --bg: #F1F5F9;
+            --card-bg: #FFFFFF;
+            --text: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --primary: #2563EB;
+            --primary-light: #3B82F6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 240px; flex-shrink: 0; background: var(--sidebar-bg);
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+            overflow-y: auto;
+        }
+        .sidebar-brand {
+            padding: 20px 20px 16px; border-bottom: 1px solid #1E293B;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-logo { font-size: 24px; }
+        .sidebar-name { font-size: 17px; font-weight: 800; color: white; }
+        .sidebar-name small { display: block; font-size: 10px; font-weight: 400; color: var(--sidebar-text); }
+
+        .sidebar-nav { padding: 12px 10px; flex: 1; }
+        .nav-section-title {
+            font-size: 10px; font-weight: 700; color: #475569;
+            text-transform: uppercase; letter-spacing: 1px;
+            padding: 8px 10px 4px; margin-top: 8px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: 8px; margin-bottom: 2px;
+            color: var(--sidebar-text); text-decoration: none; font-size: 13.5px; font-weight: 500;
+            transition: all .15s ease;
+        }
+        .nav-item:hover { background: var(--sidebar-hover); color: white; }
+        .nav-item.active { background: var(--sidebar-active); color: white; box-shadow: 0 2px 8px rgba(37,99,235,.4); }
+        .nav-item-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+
+        .sidebar-bottom { padding: 12px 10px; border-top: 1px solid #1E293B; }
+        .sidebar-user {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 8px; cursor: pointer;
+            transition: background .15s;
+        }
+        .sidebar-user:hover { background: var(--sidebar-hover); }
+        .sidebar-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7C3AED);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 13px; font-weight: 700; flex-shrink: 0;
+            object-fit: cover;
+        }
+        .sidebar-user-info { flex: 1; min-width: 0; }
+        .sidebar-user-name { color: white; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-user-role { color: var(--sidebar-text); font-size: 11px; }
+
+        /* ── MAIN ── */
+        .main-wrap { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: var(--topbar-bg); border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 60px;
+            display: flex; align-items: center; gap: 16px;
+            position: sticky; top: 0; z-index: 99;
+        }
+        .topbar-title { font-weight: 700; font-size: 16px; color: var(--text); flex: 1; }
+        .topbar-time { font-size: 12px; color: var(--text-muted); }
+        .topbar-actions { display: flex; align-items: center; gap: 8px; }
+        .topbar-btn {
+            padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+            background: white; color: var(--text); font-size: 13px; font-weight: 500;
+            cursor: pointer; text-decoration: none; transition: all .15s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .topbar-btn:hover { background: #F8FAFC; border-color: var(--primary-light); color: var(--primary); }
+        .topbar-btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+        .topbar-btn.primary:hover { background: var(--primary-light); }
+
+        /* ── CONTENT ── */
+        .content-area { flex: 1; padding: 24px; }
+
+        /* ── FLASH ── */
+        .flash-box { margin-bottom: 16px; }
+        .flash-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 16px; border-radius: 10px; font-size: 13.5px;
+            font-weight: 500; margin-bottom: 6px; animation: fadeIn .3s ease;
+        }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+        .flash-danger  { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+        .flash-warning { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+        .flash-info    { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+        .flash-close { margin-left: auto; cursor: pointer; background: none; border: none; opacity: .6; font-size: 16px; }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+        }
+        .page-header-left h1 { font-size: 20px; font-weight: 800; color: var(--text); }
+        .breadcrumb { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+        .breadcrumb a { color: var(--primary); text-decoration: none; }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--card-bg); border-radius: var(--radius);
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .card-header { padding: 14px 20px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: space-between; }
+        .card-body { padding: 20px; }
+
+        /* ── STAT CARDS ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stat-card {
+            background: var(--card-bg); border-radius: var(--radius);
+            border: 1px solid var(--border); padding: 18px 20px;
+            display: flex; align-items: flex-start; gap: 14px;
+            transition: box-shadow .2s;
+        }
+        .stat-card:hover { box-shadow: var(--shadow-md); }
+        .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .stat-info { flex: 1; }
+        .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+        .stat-value { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+        .stat-change { font-size: 11px; color: var(--success); margin-top: 4px; }
+
+        /* ── TABLES ── */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); background: #F8FAFC; }
+        td { padding: 12px 14px; font-size: 13.5px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+        tr:hover td { background: #F8FAFC; }
+        tr:last-child td { border-bottom: none; }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-flex; align-items: center; padding: 3px 10px;
+            border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap;
+        }
+        .badge-green  { background: #ECFDF5; color: #065F46; }
+        .badge-yellow { background: #FFFBEB; color: #92400E; }
+        .badge-red    { background: #FEF2F2; color: #991B1B; }
+        .badge-blue   { background: #EFF6FF; color: #1D4ED8; }
+        .badge-purple { background: #F5F3FF; color: #5B21B6; }
+        .badge-gray   { background: #F1F5F9; color: #475569; }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 8px; font-weight: 600;
+            font-size: 13px; cursor: pointer; border: none; text-decoration: none;
+            transition: all .15s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: #F8FAFC; border-color: var(--primary-light); }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+        /* ── FORMS ── */
+        .form-card { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+        .form-card-header { padding: 14px 20px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 14px; }
+        .form-card-body { padding: 24px 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1/-1; }
+        label { font-size: 12.5px; font-weight: 600; color: #374151; }
+        input[type="text"], input[type="email"], input[type="number"], input[type="tel"],
+        input[type="password"], select, textarea {
+            padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 13.5px; font-family: inherit; outline: none; color: var(--text);
+            transition: border-color .2s; background: white; width: 100%;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        .form-actions { margin-top: 20px; display: flex; gap: 10px; }
+
+        /* ── SEARCH BAR ── */
+        .search-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .search-input-wrap { position: relative; }
+        .search-input { padding-left: 36px !important; width: 280px; }
+        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94A3B8; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state { text-align: center; padding: 48px; }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
+        .empty-text { color: var(--text-muted); font-size: 14px; }
+
+        /* ── UTILS ── */
+        .flex { display: flex; } .items-center { align-items: center; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; }
+        .text-muted { color: var(--text-muted); }
+        .fw-bold { font-weight: 700; }
+        .mt-1 { margin-top: 8px; } .mb-2 { margin-bottom: 16px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .td-mono { font-family: monospace; font-size: 12.5px; }
+
+        @media(max-width:1024px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+        @media(max-width:768px) { .sidebar { transform: translateX(-100%); } .main-wrap { margin-left: 0; } }
+    </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <span class="sidebar-logo"><i class="ph ph-graduation-cap"></i></span>
+        <div>
+            <div class="sidebar-name">Scholara<small>Admin Panel</small></div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Utama</div>
+        <a href="/dashboard" class="nav-item {{ 'active' if active_menu == 'dashboard' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-chart-bar"></i></span> Dashboard
+        </a>
+
+        <div class="nav-section-title">Manajemen</div>
+        <a href="/produk" class="nav-item {{ 'active' if active_menu == 'produk' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-package"></i></span> Produk & Stok
+        </a>
+        <a href="/pesanan" class="nav-item {{ 'active' if active_menu == 'pesanan' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-shopping-cart"></i></span> Pesanan
+        </a>
+        <a href="/pelanggan" class="nav-item {{ 'active' if active_menu == 'pelanggan' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-users"></i></span> Pelanggan
+        </a>
+        <a href="/pengguna" class="nav-item {{ 'active' if active_menu == 'pengguna' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-user"></i></span> Pengguna Web
+        </a>
+
+        <div class="nav-section-title">Laporan</div>
+        <a href="/laporan" class="nav-item {{ 'active' if active_menu == 'laporan' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-trend-up"></i></span> Laporan
+        </a>
+        <a href="/kategori" class="nav-item {{ 'active' if active_menu == 'kategori' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-tag"></i></span> Kategori
+        </a>
+
+        <div class="nav-section-title">Sistem</div>
+        <a href="/pengaturan" class="nav-item {{ 'active' if active_menu == 'pengaturan' else '' }}">
+            <span class="nav-item-icon"><i class="ph ph-gear"></i></span> Pengaturan
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <div class="sidebar-user">
+            {% if session.get('admin_foto') %}
+            <img src="{{ session.admin_foto }}" class="sidebar-avatar" alt="Admin">
+            {% else %}
+            <div class="sidebar-avatar">A</div>
+            {% endif %}
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ session.get('admin_name', 'Master Admin') }}</div>
+                <div class="sidebar-user-role">Administrator</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="main-wrap">
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="topbar-title">{{ page_title }}</div>
+        <div class="topbar-time">{{ now.strftime('%A, %d %B %Y · %H:%M') }}</div>
+        <div class="topbar-actions">
+            <a href="/pesanan/tambah" class="topbar-btn primary">＋ Pesanan Baru</a>
+            <a href="/produk/tambah" class="topbar-btn">＋ Produk</a>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content-area">
+        <!-- Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-box">
+            {% for cat, msg in messages %}
+            <div class="flash-item flash-{{ cat }}">
+                <span>{{ msg }}</span>
+                <button class="flash-close" onclick="this.parentElement.remove()">✕</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        {{ content|safe }}
+        {% endblock %}
+    </div>
+</div>
+
+<script>
+// Auto close alerts after 5s
+document.querySelectorAll('.flash-item').forEach(el => setTimeout(() => el.style.opacity='0', 4500));
+</script>
+{{ extra_scripts|safe if extra_scripts else '' }}
+</body>
+</html>

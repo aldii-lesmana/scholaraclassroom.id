@@ -1,0 +1,161 @@
+{% extends 'user/base.html' %}
+{% block title %}Lacak Pesanan {{ pesanan.no_pesanan }} — Scholara Classroom{% endblock %}
+
+{% block extra_head %}
+<style>
+.tracking-wrap { max-width: 760px; margin: 0 auto; padding: 32px 0; }
+.tracking-title { font-size: 22px; font-weight: 800; color: #0F172A; margin-bottom: 24px; }
+
+.tracking-card {
+    background: white; border-radius: 16px; border: 1px solid #E2E8F0;
+    margin-bottom: 20px; overflow: hidden;
+}
+.tracking-card-header {
+    padding: 16px 20px; background: linear-gradient(135deg, #1E1B4B, #312E81);
+    color: white; display: flex; align-items: center; justify-content: space-between;
+}
+.tracking-no { font-weight: 800; font-size: 16px; }
+.tracking-status {
+    padding: 6px 16px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+    border: 2px solid rgba(255,255,255,.3); backdrop-filter: blur(4px);
+}
+
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #F1F5F9; }
+.info-item { }
+.info-label { font-size: 11px; color: #94A3B8; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px; }
+.info-value { font-size: 14px; font-weight: 600; color: #0F172A; }
+
+/* Timeline */
+.timeline { padding: 20px; }
+.timeline-title { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 16px; text-transform: uppercase; letter-spacing: .5px; }
+.timeline-steps { position: relative; padding-left: 28px; }
+.timeline-steps::before {
+    content:''; position: absolute; left: 9px; top: 12px; bottom: 12px;
+    width: 2px; background: #E2E8F0;
+}
+.timeline-step { position: relative; margin-bottom: 24px; }
+.timeline-step:last-child { margin-bottom: 0; }
+.step-dot {
+    position: absolute; left: -24px; width: 20px; height: 20px;
+    border-radius: 50%; border: 3px solid #E2E8F0;
+    background: white; display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+}
+.step-dot.done { background: #10B981; border-color: #10B981; color: white; }
+.step-dot.active { background: #4F46E5; border-color: #4F46E5; color: white; box-shadow: 0 0 0 4px rgba(79,70,229,.2); }
+.step-label { font-size: 14px; font-weight: 600; color: #374151; }
+.step-label.done { color: #065F46; }
+.step-label.active { color: #4F46E5; }
+.step-time { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+
+/* Items */
+.items-card { background: white; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 20px; }
+.items-header { padding: 14px 20px; border-bottom: 1px solid #F1F5F9; font-weight: 700; font-size: 14px; }
+.item-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #F8FAFC; }
+.item-img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: linear-gradient(135deg,#EEF2FF,#F5F3FF); flex-shrink: 0; }
+.item-ph { width: 52px; height: 52px; border-radius: 8px; display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#EEF2FF,#F5F3FF);color:#A5B4FC;flex-shrink:0; }
+.item-name { font-size: 13.5px; font-weight: 500; flex: 1; }
+.item-qty { font-size: 12px; color: #94A3B8; }
+.item-price { font-weight: 700; color: #4F46E5; font-size: 14px; }
+
+.total-row { display: flex; justify-content: space-between; padding: 14px 20px; font-weight: 700; font-size: 16px; background: #F8FAFC; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="tracking-wrap">
+        <div class="tracking-title"><i class="ph ph-magnifying-glass"></i> Lacak Pesanan</div>
+
+        <!-- Main card -->
+        <div class="tracking-card">
+            <div class="tracking-card-header">
+                <div>
+                    <div class="tracking-no">{{ pesanan.no_pesanan }}</div>
+                    <div style="font-size:12px;opacity:.7;margin-top:2px">
+                        <i class="ph ph-calendar"></i> {{ pesanan.tanggal_pesan.strftime('%d %B %Y') if pesanan.tanggal_pesan else '-' }}
+                    </div>
+                </div>
+                <div class="tracking-status">
+                    {% if pesanan.status == 'pending' %}<i class="ph ph-hourglass"></i> Pending
+                    {% elif pesanan.status == 'diproses' %}<i class="ph ph-arrows-clockwise"></i> Diproses
+                    {% elif pesanan.status == 'dikirim' %}<i class="ph ph-truck"></i> Dikirim
+                    {% elif pesanan.status == 'selesai' %}<i class="ph ph-check-circle"></i> Selesai
+                    {% elif pesanan.status == 'dibatalkan' %}<i class="ph ph-x-circle"></i> Dibatalkan
+                    {% else %}{{ pesanan.status }}{% endif %}
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Pembeli</div>
+                    <div class="info-value">{{ pesanan.nama_pembeli or session.get('nama','-') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Metode Bayar</div>
+                    <div class="info-value">{{ pesanan.metode_bayar | upper if pesanan.metode_bayar else 'COD' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Total Bayar</div>
+                    <div class="info-value" style="color:#4F46E5">{{ format_rupiah(pesanan.total_bayar) }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Catatan</div>
+                    <div class="info-value">{{ pesanan.catatan or '-' }}</div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+                <div class="timeline-title">Status Pengiriman</div>
+                <div class="timeline-steps">
+                    {% set statuses = ['pending', 'diproses', 'dikirim', 'selesai'] %}
+                    {% set cur_idx = statuses.index(pesanan.status) if pesanan.status in statuses else -1 %}
+
+                    {% set steps = [
+                        ('pending', '<i class="ph ph-hourglass"></i>', 'Pesanan Diterima', 'Pesanan kamu berhasil dibuat'),
+                        ('diproses', '<i class="ph ph-arrows-clockwise"></i>', 'Sedang Diproses', 'Admin sedang memproses pesananmu'),
+                        ('dikirim', '<i class="ph ph-truck"></i>', 'Dalam Pengiriman', 'Paket sedang dalam perjalanan'),
+                        ('selesai', '<i class="ph ph-check-circle"></i>', 'Pesanan Selesai', 'Paket telah diterima'),
+                    ] %}
+                    {% for status, icon, label, sub in steps %}
+                    {% set step_idx = loop.index0 %}
+                    <div class="timeline-step">
+                        <div class="step-dot {{ 'done' if step_idx < cur_idx else ('active' if step_idx == cur_idx else '') }}">
+                            {{ '✓' if step_idx < cur_idx else (icon if step_idx == cur_idx else '') }}
+                        </div>
+                        <div class="step-label {{ 'done' if step_idx < cur_idx else ('active' if step_idx == cur_idx else '') }}">
+                            {{ icon }} {{ label }}
+                        </div>
+                        <div class="step-time">{{ sub }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <div class="items-card">
+            <div class="items-header"><i class="ph ph-package"></i> Detail Produk</div>
+            {% for item in detail %}
+            <div class="item-row">
+                {% if item.gambar %}<img src="/static/uploads/produk/{{ item.gambar }}" class="item-img" alt="{{ item.nama_produk }}">
+                {% else %}<div class="item-ph"><i class="ph ph-book-open"></i></div>{% endif %}
+                <div class="item-name">{{ item.nama_produk }}</div>
+                <div class="item-qty">{{ item.jumlah }}x</div>
+                <div class="item-price">{{ format_rupiah(item.subtotal) }}</div>
+            </div>
+            {% endfor %}
+            <div class="total-row">
+                <span>Total Pembayaran</span>
+                <span style="color:#4F46E5">{{ format_rupiah(pesanan.total_bayar) }}</span>
+            </div>
+        </div>
+
+        <!-- Back -->
+        <div style="text-align:center">
+            <a href="/user/pesanan" style="color:#4F46E5;text-decoration:none;font-size:14px;font-weight:500">← Kembali ke Pesanan Saya</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

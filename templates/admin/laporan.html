@@ -1,0 +1,90 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Laporan Penjualan</h1>
+        <div class="breadcrumb"><a href="/dashboard">Dashboard</a> / Laporan</div>
+    </div>
+</div>
+
+<div class="card mb-2">
+    <div class="card-header">Filter Laporan</div>
+    <div class="card-body">
+        <form method="GET" class="search-form" style="display:flex;gap:16px;align-items:flex-end">
+            <div class="form-group" style="margin-bottom:0">
+                <label>Dari Tanggal</label>
+                <input type="date" name="start_date" value="{{ start_date }}" class="form-input">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+                <label>Sampai Tanggal</label>
+                <input type="date" name="end_date" value="{{ end_date }}" class="form-input">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+                <label>Status Pesanan</label>
+                <select name="status" class="form-input">
+                    <option value="selesai" {% if status_filter == 'selesai' %}selected{% endif %}>Selesai Saja (Omzet Valid)</option>
+                    <option value="" {% if not status_filter %}selected{% endif %}>Semua Status</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="height:38px">Tampilkan</button>
+        </form>
+    </div>
+</div>
+
+{% if data %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#F0FDF4;color:#10B981"><i class="ph ph-coins"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Total Pendapatan</div>
+            <div class="stat-value text-primary">{{ total_omzet | rupiah }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#EEF2FF;color:#4F46E5"><i class="ph ph-package"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Produk Terjual</div>
+            <div class="stat-value">{{ total_item }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#FFFBEB;color:#F59E0B"><i class="ph ph-shopping-cart"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Total Pesanan</div>
+            <div class="stat-value">{{ total_pesanan }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Rincian Penjualan Produk</div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Produk</th>
+                    <th>Kategori</th>
+                    <th style="text-align:right">Terjual</th>
+                    <th style="text-align:right">Total Pendapatan</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td class="fw-bold">{{ row.nama }}</td>
+                    <td><span class="badge badge-gray">{{ row.kategori_nama or 'Umum' }}</span></td>
+                    <td style="text-align:right" class="fw-bold">{{ row.total_terjual }}</td>
+                    <td style="text-align:right" class="text-primary fw-bold">{{ row.total_pendapatan | rupiah }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state card">
+    <div class="empty-icon"><i class="ph ph-trend-up"></i></div>
+    <div class="empty-text">Tidak ada data penjualan pada rentang waktu yang dipilih.</div>
+</div>
+{% endif %}
+{% endblock %}

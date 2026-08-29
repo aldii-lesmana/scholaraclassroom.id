@@ -1,0 +1,85 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Daftar Pelanggan</h1>
+        <div class="breadcrumb"><a href="/dashboard">Dashboard</a> / Pelanggan</div>
+    </div>
+    <div>
+        <a href="/pelanggan/tambah" class="btn btn-primary">＋ Tambah Pelanggan</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <form method="GET" class="search-form">
+            <div class="search-input-wrap">
+                <span class="search-icon"><i class="ph ph-magnifying-glass"></i></span>
+                <input type="text" name="search" class="search-input" placeholder="Cari nama atau kode pelanggan..." value="{{ search }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Cari</button>
+            {% if search %}
+            <a href="/pelanggan" class="btn btn-outline">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+    <div class="table-wrap">
+        {% if data %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Nama Pelanggan</th>
+                    <th>Kontak</th>
+                    <th>Status</th>
+                    <th>Total Belanja</th>
+                    <th style="width:120px;text-align:center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td class="td-mono fw-bold">{{ row.kode_pelanggan }}</td>
+                    <td>
+                        <div class="fw-bold">{{ row.nama }}</div>
+                        <div class="text-muted" style="font-size:11px;margin-top:2px">{{ row.kota or '-' }}</div>
+                    </td>
+                    <td>
+                        <div style="font-size:12px">📞 {{ row.telepon or '-' }}</div>
+                        <div style="font-size:12px;margin-top:2px;color:var(--text-muted)">📧 {{ row.email or '-' }}</div>
+                    </td>
+                    <td>
+                        {% if row.status == 'aktif' %}
+                        <span class="badge badge-green">Aktif</span>
+                        {% else %}
+                        <span class="badge badge-red">Non-Aktif</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-bold text-primary">{{ row.total_belanja | rupiah }}</div>
+                        <div class="text-muted" style="font-size:11px;margin-top:2px">{{ row.total_pesanan }} pesanan</div>
+                    </td>
+                    <td style="text-align:center">
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="/pelanggan/edit/{{ row.id }}" class="btn btn-outline btn-sm" title="Edit"><i class="ph ph-pencil"></i></a>
+                            {% if row.status == 'aktif' %}
+                            <a href="/pelanggan/hapus/{{ row.id }}" class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="return confirm('Nonaktifkan pelanggan ini?')" title="Nonaktifkan"><i class="ph ph-trash"></i></a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="ph ph-users"></i></div>
+            <div class="empty-text">
+                {% if search %}Tidak ada pelanggan yang cocok dengan "<strong>{{ search }}</strong>".
+                {% else %}Belum ada data pelanggan.{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Katalog Produk</h1>
+        <div class="breadcrumb"><a href="/dashboard">Dashboard</a> / Produk</div>
+    </div>
+    <div>
+        <a href="/produk/tambah" class="btn btn-primary">＋ Tambah Produk</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <form method="GET" class="search-form">
+            <div class="search-input-wrap">
+                <span class="search-icon"><i class="ph ph-magnifying-glass"></i></span>
+                <input type="text" name="search" class="search-input" placeholder="Cari nama, kode, atau mapel..." value="{{ search }}">
+            </div>
+            <select name="kategori" style="width:160px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;outline:none" onchange="this.form.submit()">
+                <option value="">Semua Kategori</option>
+                {% for k in kategori %}
+                <option value="{{ k.id }}" {% if request.args.get('kategori') == k.id|string %}selected{% endif %}>{{ k.nama }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Cari</button>
+            {% if search or request.args.get('kategori') %}
+            <a href="/produk" class="btn btn-outline">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+    
+    <div class="table-wrap">
+        {% if data %}
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:60px">Info</th>
+                    <th>Nama Produk</th>
+                    <th>Kategori</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
+                    <th style="width:120px;text-align:center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>
+                        {% if row.gambar %}
+                        <img src="/static/uploads/produk/{{ row.gambar }}" alt="Img" style="width:40px;height:40px;border-radius:6px;object-fit:cover;border:1px solid var(--border)">
+                        {% else %}
+                        <div style="width:40px;height:40px;border-radius:6px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:16px;color:#94A3B8;border:1px solid var(--border)"><i class="ph ph-book-open"></i></div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ row.nama }}</div>
+                        <div class="text-muted" style="font-size:11px;margin-top:2px">
+                            {{ row.kode_produk }} 
+                            {% if row.mapel %} • {{ row.mapel }}{% endif %}
+                            {% if row.kelas %} • Kls {{ row.kelas }}{% endif %}
+                        </div>
+                    </td>
+                    <td><span class="badge badge-gray">{{ row.kategori_nama or 'Umum' }}</span></td>
+                    <td class="fw-bold text-primary">{{ format_rupiah(row.harga) }}</td>
+                    <td>
+                        {% if row.stok <= row.stok_minimum %}
+                        <span class="badge badge-red" title="Stok Menipis">{{ row.stok }} {{ row.satuan }}</span>
+                        {% else %}
+                        <span class="badge badge-green">{{ row.stok }} {{ row.satuan }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center">
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="/produk/edit/{{ row.id }}" class="btn btn-outline btn-sm" title="Edit"><i class="ph ph-pencil"></i></a>
+                            <a href="/produk/hapus/{{ row.id }}" class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="return confirm('Hapus produk ini permanen?')" title="Hapus"><i class="ph ph-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="ph ph-package"></i></div>
+            <div class="empty-text">
+                {% if search or request.args.get('kategori') %}Tidak ada produk yang cocok dengan pencarian.
+                {% else %}Belum ada data produk di katalog.{% endif %}
+            </div>
+            <a href="/produk/tambah" class="btn btn-primary mt-2">Tambah Produk Pertama</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -206,7 +206,9 @@ def login_page():
 @app.route('/auth/google')
 def auth_google():
     import secrets
-    redirect_uri = APP_BASE_URL + '/auth/google/callback'
+    from flask import url_for
+    scheme = request.headers.get('X-Forwarded-Proto', request.scheme)
+    redirect_uri = url_for('auth_google_callback', _external=True, _scheme=scheme)
     # Generate and store nonce + state manually to prevent CSRF
     nonce = secrets.token_urlsafe(16)
     session['google_oauth_nonce'] = nonce

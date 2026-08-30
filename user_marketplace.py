@@ -57,9 +57,6 @@ DB_PORT     = int(os.environ.get('MYSQL_PORT', 3306))
 
 def get_db_connection():
     """Buat koneksi baru ke database. Wajib ditutup (cur.close(), conn.close()) setelah selesai."""
-    # TiDB Cloud memerlukan koneksi SSL. Deteksi otomatis berdasarkan hostname.
-    use_ssl = 'tidbcloud.com' in DB_HOST
-    ssl_params = {'ssl': {'ssl_verify_cert': False}} if use_ssl else {}
     return pymysql.connect(
         host=DB_HOST,
         user=DB_USER,
@@ -69,7 +66,6 @@ def get_db_connection():
         cursorclass=pymysql.cursors.DictCursor,
         charset='utf8mb4',
         autocommit=False,
-        **ssl_params,
     )
 
 # ============================================================

@@ -88,7 +88,13 @@
 .result-count { font-size: 13px; color: #94A3B8; margin-bottom: 16px; }
 
 @media(max-width:900px){ .sidebar{display:none;} .products-grid{grid-template-columns:repeat(2,1fr);} }
-@media(max-width:480px){ .products-grid{grid-template-columns:1fr;} }
+@media(max-width:480px){ 
+    .products-grid{grid-template-columns:repeat(2,1fr); gap:12px;}
+    .product-info { padding: 12px; }
+    .product-name { font-size: 13px; min-height: 36px; }
+    .product-footer { padding: 12px; }
+    .btn-cart, .btn-buy, .btn-detail { font-size: 11px; padding: 6px; }
+}
 </style>
 {% endblock %}
 

@@ -362,14 +362,26 @@
         .section-sub { color: var(--text-muted); margin-bottom: 28px; }
 
         /* ── RESPONSIVE ── */
+        .mobile-menu-btn { display: none; }
         @media (max-width: 1024px) { .grid-4 { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 768px) {
-            .navbar-nav { display: none; }
+            .mobile-menu-btn { display: flex; }
+            .navbar-nav {
+                position: absolute; top: 64px; left: 0; right: 0;
+                background: var(--bg-card); flex-direction: column;
+                padding: 16px; gap: 8px; border-bottom: 1px solid var(--border);
+                box-shadow: var(--shadow-md);
+                display: none; /* hidden by default on mobile */
+            }
+            .navbar-nav.show { display: flex; }
             .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+            .section { padding: 32px 0; }
         }
         @media (max-width: 480px) {
             .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+            .navbar-brand { font-size: 18px; }
+            .btn-icon { width: 36px; height: 36px; }
         }
 
         /* ── ADD TO CART TOAST ── */
@@ -426,6 +438,11 @@
     </ul>
 
     <div class="navbar-actions">
+        <!-- Mobile Menu Toggle -->
+        <button class="btn-icon mobile-menu-btn" onclick="document.querySelector('.navbar-nav').classList.toggle('show')">
+            <i class="ph ph-list" style="font-size: 20px;"></i>
+        </button>
+
         <!-- Notifikasi -->
         <div class="dropdown notif-wrap" id="notifWrap">
             <button class="btn-icon notif-toggle" onclick="toggleNotif()" title="Notifikasi">

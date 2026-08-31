@@ -313,8 +313,12 @@ body {
     .bento-main h1 { font-size: 32px; }
 }
 @media(max-width:480px){ 
-    .products-grid{grid-template-columns:1fr;} 
-    .cat-grid{grid-template-columns:repeat(2,1fr);}
+    .products-grid{grid-template-columns:repeat(2,1fr); gap:12px;} 
+    .cat-grid{grid-template-columns:repeat(2,1fr); gap:12px;}
+    .product-info { padding: 12px; }
+    .product-name { font-size: 13px; min-height: 36px; }
+    .product-footer { padding: 12px; }
+    .btn-cart, .btn-buy, .btn-detail { font-size: 11px; padding: 6px; }
 }
 </style>
 {% endblock %}

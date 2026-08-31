@@ -57,7 +57,8 @@ DB_PORT     = int(os.environ.get('MYSQL_PORT', 3306))
 
 def get_db_connection():
     """Buat koneksi baru ke database. Wajib ditutup (cur.close(), conn.close()) setelah selesai."""
-    return pymysql.connect(
+    import ssl as _ssl
+    conn_kwargs = dict(
         host=DB_HOST,
         user=DB_USER,
         password=DB_PASSWORD,
@@ -67,6 +68,11 @@ def get_db_connection():
         charset='utf8mb4',
         autocommit=False,
     )
+    # TiDB Serverless wajib SSL/TLS
+    if DB_PORT == 4000 or 'tidbcloud.com' in DB_HOST:
+        conn_kwargs['ssl'] = _ssl.create_default_context()
+    return pymysql.connect(**conn_kwargs)
+
 
 # ============================================================
 # GOOGLE OAUTH CONFIG
